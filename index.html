@@ -19,20 +19,30 @@
     body {
       background: #000;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      min-height: 100vh;
+      justify-content: center;
+      height: 100vh;
       overflow: hidden;
     }
 
     .game-container {
       position: relative;
       width: 100vw;
+      max-height: 100vh;
+      aspect-ratio: 1024 / 576;
+    }
+
+    @media (min-aspect-ratio: 1024/576) {
+      .game-container {
+        width: auto;
+        height: 100vh;
+      }
     }
 
     canvas {
       display: block;
       width: 100%;
+      height: 100%;
     }
 
     .hud {
@@ -205,6 +215,27 @@
       color: #d0d0d8;
       font-size: 0.75rem;
     }
+
+    .credit {
+      z-index: 10;
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 0.55rem;
+    }
+
+    .pixel-heart {
+      display: inline-block;
+      width: 11px;
+      height: 10px;
+      margin: 0 4px;
+      vertical-align: middle;
+      image-rendering: pixelated;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 10' shape-rendering='crispEdges'%3E%3Crect x='1' y='0' width='3' height='1' fill='%23ff2d55'/%3E%3Crect x='7' y='0' width='3' height='1' fill='%23ff2d55'/%3E%3Crect x='0' y='1' width='5' height='1' fill='%23ff2d55'/%3E%3Crect x='6' y='1' width='5' height='1' fill='%23ff2d55'/%3E%3Crect x='0' y='2' width='11' height='1' fill='%23ff2d55'/%3E%3Crect x='0' y='3' width='11' height='1' fill='%23ff2d55'/%3E%3Crect x='1' y='4' width='9' height='1' fill='%23ff2d55'/%3E%3Crect x='2' y='5' width='7' height='1' fill='%23ff2d55'/%3E%3Crect x='3' y='6' width='5' height='1' fill='%23ff2d55'/%3E%3Crect x='4' y='7' width='3' height='1' fill='%23ff2d55'/%3E%3Crect x='5' y='8' width='1' height='1' fill='%23ff2d55'/%3E%3C/svg%3E");
+      background-size: 100% 100%;
+    }
   </style>
 </head>
 <body>
@@ -223,6 +254,8 @@
     <div id="displayText">Tie</div>
     <canvas></canvas>
   </div>
+
+  <div class="credit">Made with <span class="pixel-heart"></span> by Vinicius Dias</div>
 
   <button class="help-btn" onclick="document.querySelector('.help-dialog').classList.add('open')">?</button>
 
