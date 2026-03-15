@@ -1,4 +1,4 @@
-
+let gameOver = false
 
 function rectangularCollision({rectangle1, rectangle2}) {
   return (
@@ -10,15 +10,42 @@ function rectangularCollision({rectangle1, rectangle2}) {
 }
 
 function determineWinner ({ player, enemy, timerId }) {
+  gameOver = true
   clearTimeout(timerId)
-  document.querySelector('#displayText').style.display = 'flex'
+  const displayText = document.querySelector('#displayText')
+  displayText.style.display = 'flex'
+
   if (player.health === enemy.health) {
-    document.querySelector('#displayText').innerHTML = 'Tie'
+    displayText.innerHTML = 'Tie'
   } else if (player.health > enemy.health) {
-    document.querySelector('#displayText').innerHTML = 'Player 1 Wins'
+    displayText.innerHTML = 'Player 1 Wins'
   } else if (player.health < enemy.health) {
-    document.querySelector('#displayText').innerHTML = 'Player 2 Wins'
+    displayText.innerHTML = 'Player 2 Wins'
   }
+
+  setTimeout(() => {
+    restartGame({ player, enemy })
+  }, 3000)
+}
+
+function restartGame({ player, enemy }) {
+  player.reset(200, 0)
+  enemy.reset(700, 0)
+
+  gsap.to('#playerHealth', { width: '100%' })
+  gsap.to('#enemyHealth', { width: '100%' })
+
+  document.querySelector('#displayText').style.display = 'none'
+
+  keys.a.pressed = false
+  keys.d.pressed = false
+  keys.ArrowRight.pressed = false
+  keys.ArrowLeft.pressed = false
+
+  timer = 60
+  document.querySelector('#timer').innerHTML = timer
+  gameOver = false
+  decreaseTimer()
 }
 
 let timer = 60
@@ -30,7 +57,7 @@ function decreaseTimer() {
     document.querySelector('#timer').innerHTML = timer
   }
 
-  if (timer === 0) {
+  if (timer === 0 && !gameOver) {
     determineWinner({ player, enemy, timerId })
   }
 }

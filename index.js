@@ -28,7 +28,7 @@ const shop = new Sprite({
 
 const player = new Fighter({
   position: {
-    x: 0,
+    x: 200,
     y: 0
   },
   velocity: {
@@ -90,8 +90,8 @@ player.draw()
 
 const enemy = new Fighter({
   position: {
-    x: 400,
-    y: 100
+    x: 700,
+    y: 0
   },
   velocity: {
     x: 0,
@@ -256,8 +256,7 @@ function animate() {
     enemy.isAttacking = false
   }
 
-  //end game based on health
-  if (enemy.health <= 0 || player.health <= 0) {
+  if (!gameOver && (enemy.health <= 0 || player.health <= 0)) {
     determineWinner({ player, enemy, timerId })
   }
 }
@@ -265,6 +264,10 @@ function animate() {
 animate()
 
 window.addEventListener('keydown', (event) => {
+  if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(event.key)) {
+    event.preventDefault()
+  }
+
   if (!player.dead) {
     switch (event.key) {
       case 'd':

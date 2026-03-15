@@ -120,6 +120,20 @@ class Fighter extends Sprite {
     } else this.velocity.y += gravity
   }
 
+  reset(x, y) {
+    this.position.x = x
+    this.position.y = y
+    this.velocity.x = 0
+    this.velocity.y = 0
+    this.health = 100
+    this.dead = false
+    this.isAttacking = false
+    this.image = this.sprites.idle.image
+    this.framesMax = this.sprites.idle.framesMax
+    this.framesCurrent = 0
+    this.framesElapsed = 0
+  }
+
   attack() {
     this.switchSprite('attack1')
     this.isAttacking = true

@@ -1,135 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fighting Game</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <style>
     * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
       font-family: 'Press Start 2P', cursive;
+    }
+
+    body {
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .game-container {
+      position: relative;
+      width: 100vw;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+    }
+
+    .hud {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      padding: 2% 2%;
+    }
+
+    .health-bar {
+      position: relative;
+      width: 100%;
+      height: 30px;
+    }
+
+    .health-bar-bg {
+      background-color: red;
+      height: 100%;
+      width: 100%;
+    }
+
+    .health-bar-fill {
+      position: absolute;
+      background: #818CF8;
+      top: 0;
+      bottom: 0;
+    }
+
+    .health-bar--left {
+      border-top: 4px solid white;
+      border-left: 4px solid white;
+      border-bottom: 4px solid white;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .health-bar--left .health-bar-fill {
+      right: 0;
+      width: 100%;
+    }
+
+    .health-bar--right {
+      border-top: 4px solid white;
+      border-right: 4px solid white;
+      border-bottom: 4px solid white;
+    }
+
+    .health-bar--right .health-bar-fill {
+      left: 0;
+      right: 0;
+    }
+
+    #timer {
+      background-color: black;
+      width: 100px;
+      height: 50px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      border: 4px solid white;
+    }
+
+    #displayText {
+      position: absolute;
+      color: white;
+      align-items: center;
+      justify-content: center;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: none;
+    }
+
+    .help-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      background: rgba(129, 140, 248, 0.15);
+      color: #818CF8;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, border-color 0.2s;
+      z-index: 10;
+    }
+
+    .help-btn:hover {
+      background: rgba(129, 140, 248, 0.3);
+      border-color: #818CF8;
+    }
+
+    .help-dialog {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 20;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.8);
+    }
+
+    .help-dialog.open {
+      display: flex;
+    }
+
+    .help-dialog-content {
+      background: #111;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 28px 32px;
+      max-width: 700px;
+      width: 90%;
+      display: flex;
+      gap: 40px;
+    }
+
+    .help-dialog-content h3 {
+      color: #818CF8;
+      font-size: 0.75rem;
+      margin-bottom: 12px;
+    }
+
+    .controls-column {
+      flex: 1;
+    }
+
+    .keys-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .keys-table th,
+    .keys-table td {
+      text-align: left;
+      padding: 8px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 0.7rem;
+    }
+
+    .keys-table th {
+      color: #818CF8;
+      font-size: 0.6rem;
+    }
+
+    .keys-table td {
+      color: #a0a0a8;
+    }
+
+    .keys-table kbd {
+      font-family: monospace;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      padding: 2px 8px;
+      color: #d0d0d8;
+      font-size: 0.75rem;
     }
   </style>
 </head>
 <body>
-  <!-- red container div -->
-  <div
-    style="
-      position: relative;
-      display: inline-block;
-    "
-  >
-    <!-- smaller red container div -->
-    <div 
-      style="
-        position: absolute; 
-        display: flex; 
-        width: 100%; 
-        align-items: center; 
-        padding: 20px;
-      "
-    >
-      <!-- player healt -->
-      <div 
-        style="
-          position: relative;
-          width: 100%; 
-          display: flex; 
-          justify-content: flex-end;
-          border-top: 4px solid white;
-          border-left: 4px solid white;
-          border-bottom: 4px solid white;
-        "
-      >
-        <div 
-          style="
-            background-color: red;
-            height: 30px;
-            width: 100%;
-          "
-        ></div>
-        <div 
-          id="playerHealth" 
-          style="
-            position: absolute; 
-            background: #818CF8; 
-            top: 0; 
-            right: 0; 
-            bottom: 0; 
-            width: 100%;
-          "
-        ></div>
+  <div class="game-container">
+    <div class="hud">
+      <div class="health-bar health-bar--left">
+        <div class="health-bar-bg"></div>
+        <div id="playerHealth" class="health-bar-fill"></div>
       </div>
-      <!-- timer -->
-      <div 
-        id="timer"
-        style="
-          background-color: black;
-          width: 100px;
-          height: 50px;
-          flex-shrink: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          border: 4px solid white;
-        "
-      >
-        10
+      <div id="timer">10</div>
+      <div class="health-bar health-bar--right">
+        <div class="health-bar-bg"></div>
+        <div id="enemyHealth" class="health-bar-fill"></div>
       </div>
-      <!-- enemy healt -->
-      <div 
-        style="
-          position: relative;
-          width: 100%;
-          border-top: 4px solid white;
-          border-right: 4px solid white;
-          border-bottom: 4px solid white;
-        "
-      >
-        <div 
-          style="
-            background-color: red;
-            height: 30px;
-          "
-        ></div>
-        <div 
-          id="enemyHealth"
-          style="
-            position: absolute;
-            background: #818CF8;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-          "
-        ></div>
-      </div>
-      <div></div>
     </div>
-    <div 
-      id="displayText"
-      style="
-        position: absolute; 
-        color: white; 
-        align-items: center; 
-        justify-content: center;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        display: none;
-      "
-    >
-      Tie
-    </div>
+    <div id="displayText">Tie</div>
     <canvas></canvas>
   </div>
-  <script 
-    src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/gsap.min.js" 
+
+  <button class="help-btn" onclick="document.querySelector('.help-dialog').classList.add('open')">?</button>
+
+  <div class="help-dialog" onclick="this.classList.remove('open')">
+    <div class="help-dialog-content" onclick="event.stopPropagation()">
+      <div class="controls-column">
+        <h3>Player 1</h3>
+        <table class="keys-table">
+          <thead>
+            <tr>
+              <th>Action</th>
+              <th>Key</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Move left</td>
+              <td><kbd>A</kbd></td>
+            </tr>
+            <tr>
+              <td>Move right</td>
+              <td><kbd>D</kbd></td>
+            </tr>
+            <tr>
+              <td>Jump</td>
+              <td><kbd>W</kbd></td>
+            </tr>
+            <tr>
+              <td>Attack</td>
+              <td><kbd>Space</kbd></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="controls-column">
+        <h3>Player 2</h3>
+        <table class="keys-table">
+          <thead>
+            <tr>
+              <th>Action</th>
+              <th>Key</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Move left</td>
+              <td><kbd>&#8592;</kbd></td>
+            </tr>
+            <tr>
+              <td>Move right</td>
+              <td><kbd>&#8594;</kbd></td>
+            </tr>
+            <tr>
+              <td>Jump</td>
+              <td><kbd>&#8593;</kbd></td>
+            </tr>
+            <tr>
+              <td>Attack</td>
+              <td><kbd>&#8595;</kbd></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/gsap.min.js"
     integrity="sha512-VEBjfxWUOyzl0bAwh4gdLEaQyDYPvLrZql3pw1ifgb6fhEvZl9iDDehwHZ+dsMzA0Jfww8Xt7COSZuJ/slxc4Q=="
-    crossorigin="anonymous" 
+    crossorigin="anonymous"
     referrerpolicy="no-referrer"
   ></script>
   <script src="js/utils.js"></script>
   <script src="js/classes.js"></script>
   <script src="index.js"></script>
 </body>
+</html>
